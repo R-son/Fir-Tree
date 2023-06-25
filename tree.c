@@ -2,42 +2,24 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int check_size(int size)
-{
-    if (size < 0)
-        write(2, "Invalid argument\n", 18);
-    return (size < 0) ? (-1) : 0;
-}
-
 int	get_columns(int size)
 {
     int columns = 1;
     int max_lines;
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 1; i < size + 1; i++) {
         max_lines = i + 3;
         for (int j = 0; j < max_lines; j++)
             columns += 2;
         columns = (i % 2 == 0) ? columns - i : columns - (i+1); 
     }
-    return columns;
+    return (columns - 4);
 }
-
-// void put_tree(int size, int columns)
-// {
-//     int spaces;
-
-//     for (int i = 0; i < size; i++) {
-//         spaces 
-//     }
-// }
 
 void put_trunk(int size, int columns)
 {
-    int spaces;
+    int spaces = (columns - size) / 2;
 
-    printf("Max size: %i", columns);
-    spaces = (columns - size) / 2;
     for (int i = spaces; i > 0; i--)
         write(1, " ", 1);
     for (int i = 0; i < size; i++)
@@ -47,29 +29,43 @@ void put_trunk(int size, int columns)
     write(1, "\n", 1);
 }
 
-void tree(int size) //trunk size == size
+void draw(int line, int max_size)
 {
-    int trunk_size;
-    int max_columns;
-    int max_blk_size = size + 3;
+    int spaces = (max_size - line) / 2;
 
-    if(size == 0 || check_size(size) == -1)
-        return;
-    trunk_size = (size % 2 == 1) ? size : size + 1;
-    max_columns = get_columns(size);
-    // put_tree(size, max_columns);
-    for (int i = 0; i < size; i++)
-        put_trunk(trunk_size, max_columns);
+    for (int i = spaces; i > 0; i--)
+        write(1, " ", 1);
+    for (int i = 0; i < line; i++)
+        write(1, "*", 1);
+    for (int i = spaces; i > 0; i--)
+        write(1, " ", 1);
+    write(1, "\n", 1);
 }
 
-int main()
+void put_tree(int size, int max_size)
 {
-    int a = 1;
-    int b = 2;
-    int c = 5;
+    int line = 1;
+    for (int i = 1; i < size + 1; i++) {
+        for (int j = 0; j < i + 3 ; j++) {
+            draw(line, max_size);
+            line += 2;
+        }
+        line -= 2;
+        line = line - ((i + 1) / 2) * 2;
+    }
+}
 
-    tree(a);
-    tree(b);
-    tree(c);
-    return 0;
+void tree(int size)
+{
+    int trk = (size % 2 == 1) ? size : size + 1;
+    int columns = (size > 0) ? get_columns(size) : 0;
+
+    if(size <= 0) {
+        if (size < 0)
+            write(2, "Invalid argument\n", 18);
+        return;
+    }
+    put_tree(size, columns);
+    for (int i = 0; i < size; i++)
+        put_trunk(trk, columns);
 }
